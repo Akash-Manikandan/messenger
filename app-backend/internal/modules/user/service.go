@@ -124,5 +124,6 @@ func (s *service) VerifyUser(userID string) error {
 	}
 
 	user.IsVerified = true
+	QueueWelcomeEmail(s.emailQueue, user.Email, user.Username)
 	return s.db.Save(&user).Error
 }
