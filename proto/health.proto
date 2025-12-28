@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "internal/modules/health;health";
+
+// HealthService provides health check functionality for the service
+service HealthService {
+  // Check returns the health status of the service
+  rpc Check(HealthRequest) returns (HealthResponse);
+}
+
+// HealthRequest represents a request to check the health status of the service
+message HealthRequest {}
+
+// HealthResponse represents the health status response from the service
+message HealthResponse {
+  string status = 1;
+  string postgres_db_status = 2;
+}
