@@ -38,7 +38,7 @@ type EmailJob struct {
 	To        string       `json:"to"`
 	FromEmail string       `json:"fromEmail"`
 	FromName  string       `json:"fromName"`
-	Data      interface{}  `json:"data"`
+	Data      any          `json:"data"`
 }
 
 // VerificationEmailJob is a strongly-typed verification email job
@@ -95,7 +95,7 @@ func (q *EmailQueue) PublishWelcomeEmail(ctx context.Context, to string, data We
 }
 
 // publishTyped pushes a typed job to the Redis queue using BullMQ format
-func (q *EmailQueue) publishTyped(ctx context.Context, job interface{}) error {
+func (q *EmailQueue) publishTyped(ctx context.Context, job any) error {
 	data, err := json.Marshal(job)
 	if err != nil {
 		return err
@@ -122,7 +122,7 @@ func (q *EmailQueue) publishTyped(ctx context.Context, job interface{}) error {
 	// Publish event to notify workers (BullMQ v5+ uses streams for events)
 	pipe.XAdd(ctx, &redis.XAddArgs{
 		Stream: EmailQueueName + ":events",
-		Values: map[string]interface{}{
+		Values: map[string]any{
 			"event": "added",
 			"jobId": jobID,
 		},

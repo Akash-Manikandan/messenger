@@ -2,10 +2,13 @@ package user
 
 import (
 	"context"
+	"errors"
+	"strings"
 
 	"github.com/Akash-Manikandan/app-backend/internal/models"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type GRPCServer struct {
@@ -22,6 +25,14 @@ func (g *GRPCServer) CreateUser(ctx context.Context, req *CreateUserRequest) (*U
 		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
 	}
 
+	// Check for duplicate username or email
+	if _, err := g.service.GetUserByUsername(req.Username); err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "username already exists")
+	}
+	if _, err := g.service.GetUserByEmail(req.Email); err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "email already exists")
+	}
+
 	user := &models.User{
 		Username:  req.Username,
 		Email:     req.Email,
@@ -31,6 +42,10 @@ func (g *GRPCServer) CreateUser(ctx context.Context, req *CreateUserRequest) (*U
 	}
 
 	if err := g.service.CreateUser(user); err != nil {
+		// Handle duplicate key errors (backup check)
+		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "UNIQUE constraint") {
+			return nil, status.Errorf(codes.AlreadyExists, "user already exists")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
@@ -44,7 +59,10 @@ func (g *GRPCServer) GetUser(ctx context.Context, req *GetUserRequest) (*UserRes
 
 	user, err := g.service.GetUserByID(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "user not found")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "failed to fetch user: %v", err)
 	}
 
 	return toProtoUser(user), nil
@@ -57,7 +75,10 @@ func (g *GRPCServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*U
 
 	user, err := g.service.GetUserByID(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "user not found")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "failed to fetch user: %v", err)
 	}
 
 	// Update fields if provided
@@ -93,6 +114,9 @@ func (g *GRPCServer) DeleteUser(ctx context.Context, req *DeleteUserRequest) (*D
 	}
 
 	if err := g.service.DeleteUser(req.Id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to delete user: %v", err)
 	}
 

@@ -1,5 +1,6 @@
 /** @jsxImportSource preact */
 import { EmailLayout } from "./EmailLayout";
+import { EmailSignature } from "./EmailSignature";
 
 interface WelcomeEmailProps {
   username: string;
@@ -29,11 +30,7 @@ export function WelcomeEmail({ username }: WelcomeEmailProps) {
         <p style="font-size: 16px; line-height: 1.6; color: #555;">
           Start exploring and connecting today!
         </p>
-        <p style="font-size: 14px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 20px;">
-          Best regards,
-          <br />
-          The Messenger Team
-        </p>
+        <EmailSignature />
       </div>
     </EmailLayout>
   );

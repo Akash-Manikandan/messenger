@@ -32,6 +32,13 @@ func (User) TableName() string {
 	return "users"
 }
 
+// Redact removes sensitive fields (password, salt) from the user object
+func (u *User) Redact() *User {
+	u.Password = ""
+	u.Salt = ""
+	return u
+}
+
 // BeforeCreate hook to generate ULID before creating
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.ID == "" {

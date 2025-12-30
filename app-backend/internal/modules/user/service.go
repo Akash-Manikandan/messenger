@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Akash-Manikandan/app-backend/internal/config"
 	"github.com/Akash-Manikandan/app-backend/internal/models"
@@ -37,32 +38,32 @@ func NewService(db *gorm.DB, redis *redis.Client) Service {
 func (s *service) CreateUser(user *models.User) error {
 	// Validate password strength
 	if err := crypto.ValidatePasswordStrength(user.Password); err != nil {
-		return err
+		return fmt.Errorf("invalid password: %w", err)
 	}
 
 	// Generate salt for this user
 	salt, err := crypto.GenerateSalt()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to generate salt: %w", err)
 	}
 	user.Salt = salt
 
 	// Hash the password with the salt
 	hashedPassword, err := crypto.HashPassword(user.Password, salt)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to hash password: %w", err)
 	}
 	user.Password = hashedPassword
 
 	// Create user in database
 	if err := s.db.Create(user).Error; err != nil {
-		return err
+		return fmt.Errorf("failed to create user: %w", err)
 	}
 
 	cfg := config.Load()
 
 	// Queue verification email asynchronously (non-blocking)
-	verificationUrl := cfg.AppBackendURL + "/api/users/" + user.ID + "/verify"
+	verificationUrl := fmt.Sprintf("%s/api/users/%s/verify", cfg.AppBackendURL, user.ID)
 	QueueVerificationEmail(s.emailQueue, user.Email, user.Username, verificationUrl)
 
 	return nil

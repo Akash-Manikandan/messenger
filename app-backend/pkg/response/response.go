@@ -34,6 +34,11 @@ func NotFound(ctx *fiber.Ctx, message string) error {
 	return Error(ctx, fiber.StatusNotFound, message)
 }
 
+// Conflict sends a 409 Conflict error
+func Conflict(ctx *fiber.Ctx, message string) error {
+	return Error(ctx, fiber.StatusConflict, message)
+}
+
 // InternalError sends a 500 Internal Server Error
 func InternalError(ctx *fiber.Ctx, message string) error {
 	return Error(ctx, fiber.StatusInternalServerError, message)

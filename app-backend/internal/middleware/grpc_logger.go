@@ -19,6 +19,14 @@ type GRPCRequestLog struct {
 	Error      error
 }
 
+// extractClientIP extracts client IP from context with fallback
+func extractClientIP(ctx context.Context) string {
+	if p, ok := peer.FromContext(ctx); ok {
+		return p.Addr.String()
+	}
+	return "unknown"
+}
+
 // UnaryServerInterceptor logs unary gRPC requests asynchronously
 func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(
@@ -29,17 +37,11 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	) (any, error) {
 		start := time.Now()
 
-		// Get client IP
-		clientIP := "unknown"
-		if p, ok := peer.FromContext(ctx); ok {
-			clientIP = p.Addr.String()
-		}
-
 		// Capture request details
 		reqLog := GRPCRequestLog{
 			Timestamp: start,
 			Method:    info.FullMethod,
-			IP:        clientIP,
+			IP:        extractClientIP(ctx),
 		}
 
 		// Call the handler
@@ -71,17 +73,11 @@ func StreamServerInterceptor() grpc.StreamServerInterceptor {
 	) error {
 		start := time.Now()
 
-		// Get client IP
-		clientIP := "unknown"
-		if p, ok := peer.FromContext(ss.Context()); ok {
-			clientIP = p.Addr.String()
-		}
-
 		// Capture request details
 		reqLog := GRPCRequestLog{
 			Timestamp: start,
 			Method:    info.FullMethod,
-			IP:        clientIP,
+			IP:        extractClientIP(ss.Context()),
 		}
 
 		// Call the handler

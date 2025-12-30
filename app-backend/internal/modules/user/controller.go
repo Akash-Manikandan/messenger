@@ -37,7 +37,7 @@ func (c *Controller) CreateUser(ctx *fiber.Ctx) error {
 		return response.InternalError(ctx, err.Error())
 	}
 
-	return response.Created(ctx, user)
+	return response.Created(ctx, user.Redact())
 }
 
 func (c *Controller) GetUser(ctx *fiber.Ctx) error {
@@ -51,7 +51,7 @@ func (c *Controller) GetUser(ctx *fiber.Ctx) error {
 		return response.NotFound(ctx, "User not found")
 	}
 
-	return response.Success(ctx, user)
+	return response.Success(ctx, user.Redact())
 }
 
 func (c *Controller) UpdateUser(ctx *fiber.Ctx) error {
@@ -70,7 +70,7 @@ func (c *Controller) UpdateUser(ctx *fiber.Ctx) error {
 		return response.InternalError(ctx, err.Error())
 	}
 
-	return response.Success(ctx, user)
+	return response.Success(ctx, user.Redact())
 }
 
 func (c *Controller) DeleteUser(ctx *fiber.Ctx) error {
@@ -93,6 +93,11 @@ func (c *Controller) ListUsers(ctx *fiber.Ctx) error {
 	users, err := c.service.ListUsers(limit, offset)
 	if err != nil {
 		return response.InternalError(ctx, err.Error())
+	}
+
+	// Redact sensitive fields from all users
+	for i := range users {
+		users[i].Redact()
 	}
 
 	return response.SuccessWithMeta(ctx, users, fiber.Map{
@@ -126,6 +131,6 @@ func (c *Controller) VerifyUser(ctx *fiber.Ctx) error {
 	return response.Success(ctx, fiber.Map{
 		"success": true,
 		"message": "User verified successfully",
-		"user":    user,
+		"user":    user.Redact(),
 	})
 }

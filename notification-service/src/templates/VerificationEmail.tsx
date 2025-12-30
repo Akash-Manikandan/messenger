@@ -1,5 +1,6 @@
 /** @jsxImportSource preact */
 import { EmailLayout } from "./EmailLayout";
+import { EmailSignature } from "./EmailSignature";
 
 interface VerificationEmailProps {
   username: string;
@@ -40,6 +41,7 @@ export function VerificationEmail({ username, url }: VerificationEmailProps) {
           If you didn't sign up for this account, you can safely ignore this
           email.
         </p>
+        <EmailSignature />
       </div>
     </EmailLayout>
   );
