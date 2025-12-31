@@ -1,16 +1,17 @@
 import { createClient } from '@connectrpc/connect';
-import { createConnectTransport } from '@connectrpc/connect-web';
+import { createGrpcTransport } from '@connectrpc/connect-node';
 import { UserService } from '$lib/proto/user_pb';
 import { HealthService } from '$lib/proto/health_pb';
 
 // Get the backend URL from environment variables or use default
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+// For gRPC, use http2:// prefix or just the URL without prefix
+const BACKEND_URL = import.meta.env.VITE_GRPC_URL || 'http://localhost:9090';
 
-// Create a Connect transport for browser
-const transport = createConnectTransport({
+// Create a gRPC transport for Node.js server to connect to your Go gRPC backend
+const transport = createGrpcTransport({
 	baseUrl: BACKEND_URL,
-	// Add any interceptors or custom options here
-	useBinaryFormat: true // Use binary format for better performance
+	idleConnectionTimeoutMs: 30000,
+	useBinaryFormat: true
 });
 
 // Create typed clients using service descriptors from protoc-gen-es v2
