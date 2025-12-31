@@ -1,14 +1,18 @@
 version: v2
 plugins:
-  - remote: buf.build/protocolbuffers/go
-    out: proto
+  # Go plugins for backend using local protoc plugins
+  - local: protoc-gen-go
+    out: app-backend
     opt:
-      - paths=source_relative
-  - remote: buf.build/grpc/go
-    out: proto
+      - module=github.com/Akash-Manikandan/app-backend
+  - local: protoc-gen-go-grpc
+    out: app-backend
     opt:
-      - paths=source_relative
-  - remote: buf.build/bufbuild/validate-go
-    out: proto
-    opt:
-      - paths=source_relative
+      - module=github.com/Akash-Manikandan/app-backend
+      - require_unimplemented_servers=false
+
+  # TypeScript plugin for frontend
+  - local: ["npx", "@bufbuild/protoc-gen-es"]
+    out: app-frontend/src/lib/proto
+    include_imports: true
+    opt: target=ts

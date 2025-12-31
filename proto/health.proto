@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "internal/modules/health;health";
+option go_package = "github.com/Akash-Manikandan/app-backend/internal/modules/health;health";
 
 // HealthService provides health check functionality for the service
 service HealthService {

@@ -5,9 +5,9 @@ modules:
       - proto/validate
 deps:
   - buf.build/envoyproxy/protoc-gen-validate
+lint:
+  use:
+    - STANDARD
 breaking:
   use:
     - FILE
-lint:
-  use:
-    - DEFAULT

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "internal/modules/user;user";
+option go_package = "github.com/Akash-Manikandan/app-backend/internal/modules/user;user";
 
 import "validate/validate.proto";
 
