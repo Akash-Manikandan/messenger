@@ -17,7 +17,6 @@ export const userService = {
 		firstName?: string;
 		lastName?: string;
 	}) {
-		// @ts-ignore
 		return await userClient.createUser({
 			username: data.username,
 			email: data.email,
@@ -31,7 +30,6 @@ export const userService = {
 	 * Get a user by ID
 	 */
 	async getUser(id: string) {
-		// @ts-ignore
 		return await userClient.getUser({ id });
 	},
 
@@ -47,7 +45,6 @@ export const userService = {
 		isActive?: boolean;
 		isVerified?: boolean;
 	}) {
-		// @ts-ignore
 		return await userClient.updateUser({
 			id: data.id,
 			firstName: data.firstName,
@@ -63,7 +60,6 @@ export const userService = {
 	 * Delete a user by ID
 	 */
 	async deleteUser(id: string) {
-		// @ts-ignore
 		return await userClient.deleteUser({ id });
 	},
 
@@ -71,7 +67,6 @@ export const userService = {
 	 * List users with pagination
 	 */
 	async listUsers(params?: { limit?: number; offset?: number }) {
-		// @ts-ignore
 		return await userClient.listUsers({
 			limit: params?.limit || 10,
 			offset: params?.offset || 0
@@ -82,7 +77,6 @@ export const userService = {
 	 * Verify a user's email with user ID
 	 */
 	async verifyUser(userId: string) {
-		// @ts-ignore
 		return await userClient.verifyUser({ userId });
 	}
 };

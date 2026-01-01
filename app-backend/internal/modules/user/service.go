@@ -8,6 +8,7 @@ import (
 	"github.com/Akash-Manikandan/app-backend/internal/models"
 	"github.com/Akash-Manikandan/app-backend/pkg/crypto"
 	"github.com/Akash-Manikandan/app-backend/pkg/queue"
+	"github.com/lucsky/cuid"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -54,6 +55,7 @@ func (s *service) CreateUser(user *models.User) error {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 	user.Password = hashedPassword
+	user.Avatar = user.Username + "-" + cuid.New()
 
 	// Create user in database
 	if err := s.db.Create(user).Error; err != nil {

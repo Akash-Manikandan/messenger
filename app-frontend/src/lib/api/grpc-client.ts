@@ -4,7 +4,6 @@ import { UserService } from '$lib/proto/user_pb';
 import { HealthService } from '$lib/proto/health_pb';
 
 // Get the backend URL from environment variables or use default
-// For gRPC, use http2:// prefix or just the URL without prefix
 const BACKEND_URL = import.meta.env.VITE_GRPC_URL || 'http://localhost:9090';
 
 // Create a gRPC transport for Node.js server to connect to your Go gRPC backend
